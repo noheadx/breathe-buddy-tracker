@@ -78,7 +78,6 @@ const Index = () => {
               <h1 className="text-2xl font-bold">
                 {settings.name ? `${settings.name}'s ` : ''}Peak Flow Tracker
               </h1>
-              <p className="text-muted-foreground">Monitor your respiratory health daily</p>
             </div>
           </div>
           <Button 
