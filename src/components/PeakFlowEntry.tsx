@@ -100,6 +100,26 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: 
               type="number"
               value={value}
               onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => {
+                // Allow backspace, delete, tab, escape, enter, home, end, arrow keys
+                if ([8, 9, 27, 13, 46, 35, 36, 37, 38, 39, 40].includes(e.keyCode) ||
+                    // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                    (e.keyCode === 65 && e.ctrlKey) ||
+                    (e.keyCode === 67 && e.ctrlKey) ||
+                    (e.keyCode === 86 && e.ctrlKey) ||
+                    (e.keyCode === 88 && e.ctrlKey)) {
+                  return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                  e.preventDefault();
+                }
+              }}
+              onInput={(e) => {
+                // Additional filter to remove any non-numeric characters
+                const target = e.target as HTMLInputElement;
+                target.value = target.value.replace(/[^0-9]/g, '');
+              }}
               placeholder="e.g. 350"
               className="text-center text-lg h-12"
               min="1"
