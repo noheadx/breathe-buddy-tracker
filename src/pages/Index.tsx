@@ -18,13 +18,13 @@ const Index = () => {
     settings,
     addEntry,
     setSettings,
-    getTodaysEntry,
+    getTodaysEntries,
     getAverages,
     isUnderThreshold,
     getRecentEntries
   } = usePeakFlowData();
 
-  const todaysEntry = getTodaysEntry();
+  const todaysEntries = getTodaysEntries();
   const averages = getAverages();
   const recentEntries = getRecentEntries();
 
@@ -81,11 +81,11 @@ const Index = () => {
           </Button>
         </div>
 
-        {/* Alert if today's reading is below threshold */}
-        {todaysEntry && isUnderThreshold(todaysEntry.value) && (
+        {/* Alert if latest reading is below threshold */}
+        {todaysEntries.length > 0 && isUnderThreshold(todaysEntries[0].value) && (
           <div className="mb-6">
             <ThresholdAlert
-              value={todaysEntry.value}
+              value={todaysEntries[0].value}
               threshold={settings.threshold}
               onSettings={() => setSettingsOpen(true)}
             />
@@ -97,7 +97,7 @@ const Index = () => {
           <div>
             <PeakFlowEntry
               onSubmit={handleAddEntry}
-              todaysEntry={todaysEntry}
+              todaysEntries={todaysEntries}
               threshold={settings.threshold}
             />
           </div>

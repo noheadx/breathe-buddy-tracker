@@ -1,7 +1,8 @@
 export interface PeakFlowEntry {
   id: string;
   value: number;
-  date: string; // ISO date string
+  date: string; // ISO date string (YYYY-MM-DD)
+  time: string; // ISO time string
   timestamp: number;
 }
 
@@ -11,7 +12,8 @@ export interface PeakFlowSettings {
 }
 
 export interface AverageData {
-  period: number;
+  period: number | 'today';
   average: number;
   count: number;
+  label: string;
 }

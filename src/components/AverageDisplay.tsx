@@ -18,18 +18,26 @@ export function AverageDisplay({ averages, threshold }: AverageDisplayProps) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
-          {averages.map((avg) => (
+          {averages.map((avg, index) => (
             <div 
               key={avg.period} 
-              className="text-center p-4 rounded-lg bg-secondary/50 hover:bg-secondary/70 transition-colors"
+              className={`text-center p-4 rounded-lg transition-colors ${
+                avg.period === 'today' 
+                  ? 'bg-primary/10 border border-primary/20' 
+                  : 'bg-secondary/50 hover:bg-secondary/70'
+              }`}
             >
               <div className="flex items-center justify-center gap-1 mb-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">
-                  {avg.period} days
+                <span className={`text-sm font-medium ${
+                  avg.period === 'today' ? 'text-primary' : 'text-muted-foreground'
+                }`}>
+                  {avg.label}
                 </span>
               </div>
-              <div className={`text-2xl font-bold ${avg.average && avg.average < threshold ? 'text-danger' : 'text-success'}`}>
+              <div className={`text-2xl font-bold ${
+                avg.average && avg.average < threshold ? 'text-danger' : 'text-success'
+              }`}>
                 {avg.count > 0 ? avg.average : '--'}
               </div>
               <div className="text-xs text-muted-foreground mt-1">

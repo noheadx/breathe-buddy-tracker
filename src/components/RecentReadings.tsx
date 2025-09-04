@@ -39,7 +39,7 @@ export function RecentReadings({ entries, threshold }: RecentReadingsProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {entries.slice(0, 7).map((entry, index) => {
+          {entries.slice(0, 10).map((entry, index) => {
             const isUnderThreshold = entry.value < threshold;
             const date = new Date(entry.date);
             const isToday = entry.date === new Date().toISOString().split('T')[0];
@@ -62,6 +62,11 @@ export function RecentReadings({ entries, threshold }: RecentReadingsProps) {
                   <div>
                     <div className="font-medium">
                       {isToday ? 'Today' : format(date, 'MMM dd')}
+                      {entry.time && (
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {entry.time.slice(0, 5)}
+                        </span>
+                      )}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {format(date, 'EEEE')}

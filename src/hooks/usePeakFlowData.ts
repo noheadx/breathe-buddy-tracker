@@ -40,32 +40,48 @@ export function usePeakFlowData() {
   }, [settings]);
 
   const addEntry = (value: number) => {
-    const today = new Date();
-    const dateString = today.toISOString().split('T')[0];
-    
-    // Remove any existing entry for today
-    const filteredEntries = entries.filter(entry => entry.date !== dateString);
+    const now = new Date();
+    const dateString = now.toISOString().split('T')[0];
+    const timeString = now.toTimeString().split(' ')[0]; // HH:MM:SS format
     
     const newEntry: PeakFlowEntry = {
       id: Date.now().toString(),
       value,
       date: dateString,
+      time: timeString,
       timestamp: Date.now()
     };
 
-    setEntries([newEntry, ...filteredEntries].sort((a, b) => b.timestamp - a.timestamp));
+    setEntries([newEntry, ...entries].sort((a, b) => b.timestamp - a.timestamp));
   };
 
-  const getTodaysEntry = () => {
+  const getTodaysEntries = () => {
     const today = new Date().toISOString().split('T')[0];
-    return entries.find(entry => entry.date === today);
+    return entries.filter(entry => entry.date === today);
   };
 
   const getAverages = (): AverageData[] => {
     const periods = [5, 7, 10, 30];
     const now = new Date();
+    const today = now.toISOString().split('T')[0];
 
-    return periods.map(period => {
+    // Today's average
+    const todaysEntries = entries.filter(entry => entry.date === today);
+    const todaysAverage = todaysEntries.length > 0
+      ? todaysEntries.reduce((sum, entry) => sum + entry.value, 0) / todaysEntries.length
+      : 0;
+
+    const averages: AverageData[] = [
+      {
+        period: 'today',
+        average: Math.round(todaysAverage),
+        count: todaysEntries.length,
+        label: "Today"
+      }
+    ];
+
+    // Historical averages
+    periods.forEach(period => {
       const cutoffDate = new Date(now);
       cutoffDate.setDate(cutoffDate.getDate() - period);
       
@@ -78,12 +94,15 @@ export function usePeakFlowData() {
         ? recentEntries.reduce((sum, entry) => sum + entry.value, 0) / recentEntries.length
         : 0;
 
-      return {
+      averages.push({
         period,
         average: Math.round(average),
-        count: recentEntries.length
-      };
+        count: recentEntries.length,
+        label: `${period} days`
+      });
     });
+
+    return averages;
   };
 
   const isUnderThreshold = (value: number) => {
@@ -99,7 +118,7 @@ export function usePeakFlowData() {
     settings,
     addEntry,
     setSettings,
-    getTodaysEntry,
+    getTodaysEntries,
     getAverages,
     isUnderThreshold,
     getRecentEntries
