@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.5bdd19a62450429e92588b968c43ad4d',
+  appId: 'app.lovable.breathebuddytracker',
   appName: 'breathe-buddy-tracker',
   webDir: 'dist',
   server: {
