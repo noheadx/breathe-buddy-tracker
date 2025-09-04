@@ -21,7 +21,13 @@ export function usePeakFlowData() {
     const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
 
     if (savedEntries) {
-      setEntries(JSON.parse(savedEntries));
+      const parsedEntries = JSON.parse(savedEntries);
+      // Migrate old entries that don't have time field
+      const migratedEntries = parsedEntries.map((entry: any) => ({
+        ...entry,
+        time: entry.time || '12:00:00' // Default time for old entries
+      }));
+      setEntries(migratedEntries);
     }
 
     if (savedSettings) {

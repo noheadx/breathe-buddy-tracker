@@ -47,7 +47,9 @@ export function PeakFlowEntry({ onSubmit, todaysEntries, threshold }: PeakFlowEn
             <div className="grid gap-2">
               {todaysEntries.slice(0, 3).map((entry, index) => (
                 <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">{entry.time.slice(0, 5)}</span>
+                  <span className="text-muted-foreground">
+                    {entry.time ? entry.time.slice(0, 5) : '--:--'}
+                  </span>
                   <span className={`font-medium ${entry.value < threshold ? 'text-danger' : 'text-success'}`}>
                     {entry.value} L/min
                   </span>
