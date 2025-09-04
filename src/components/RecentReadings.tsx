@@ -11,7 +11,7 @@ interface RecentReadingsProps {
 export function RecentReadings({ entries, threshold }: RecentReadingsProps) {
   if (entries.length === 0) {
     return (
-      <Card className="bg-gradient-card shadow-soft">
+      <Card className="bg-card shadow-soft">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
@@ -30,7 +30,7 @@ export function RecentReadings({ entries, threshold }: RecentReadingsProps) {
   }
 
   return (
-    <Card className="bg-gradient-card shadow-soft">
+    <Card className="bg-card shadow-soft">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <History className="h-5 w-5 text-primary" />

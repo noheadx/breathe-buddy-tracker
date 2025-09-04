@@ -71,7 +71,7 @@ const Index = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-primary rounded-lg">
+            <div className="p-2 bg-primary rounded-lg">
               <Activity className="h-6 w-6 text-white" />
             </div>
             <div>

@@ -49,7 +49,7 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: 
   };
 
   return (
-    <Card className="bg-gradient-card shadow-soft">
+    <Card className="bg-card shadow-soft">
       <CardHeader className="text-center">
         <CardTitle className="flex items-center justify-center gap-2 text-xl">
           <Activity className="h-6 w-6 text-primary" />
