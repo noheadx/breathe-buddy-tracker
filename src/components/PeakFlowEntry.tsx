@@ -3,17 +3,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Activity, Plus } from 'lucide-react';
+import { Activity, Plus, Trash2 } from 'lucide-react';
+import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
 interface PeakFlowEntryProps {
   onSubmit: (value: number) => void;
-  todaysEntries: Array<{ value: number; time: string }>;
+  onDelete: (entryId: string) => void;
+  todaysEntries: Array<{ id: string; value: number; time: string }>;
   threshold: number;
 }
 
-export function PeakFlowEntry({ onSubmit, todaysEntries, threshold }: PeakFlowEntryProps) {
+export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: PeakFlowEntryProps) {
   const [value, setValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState<{ id: string; value: number; time: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +36,18 @@ export function PeakFlowEntry({ onSubmit, todaysEntries, threshold }: PeakFlowEn
   const latestReading = todaysEntries[0];
   const hasReadingsToday = todaysEntries.length > 0;
 
+  const handleDeleteClick = (entry: { id: string; value: number; time: string }) => {
+    setEntryToDelete(entry);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (entryToDelete) {
+      onDelete(entryToDelete.id);
+      setEntryToDelete(null);
+    }
+  };
+
   return (
     <Card className="bg-gradient-card shadow-soft">
       <CardHeader className="text-center">
@@ -46,13 +62,23 @@ export function PeakFlowEntry({ onSubmit, todaysEntries, threshold }: PeakFlowEn
             <h3 className="font-medium mb-3">Today's Readings ({todaysEntries.length})</h3>
             <div className="grid gap-2">
               {todaysEntries.slice(0, 3).map((entry, index) => (
-                <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">
-                    {entry.time ? entry.time.slice(0, 5) : '--:--'}
-                  </span>
-                  <span className={`font-medium ${entry.value < threshold ? 'text-danger' : 'text-success'}`}>
-                    {entry.value} L/min
-                  </span>
+                <div key={entry.id} className="flex justify-between items-center text-sm p-2 bg-background rounded border">
+                  <div className="flex items-center gap-3">
+                    <span className="text-muted-foreground">
+                      {entry.time ? entry.time.slice(0, 5) : '--:--'}
+                    </span>
+                    <span className={`font-medium ${entry.value < threshold ? 'text-danger' : 'text-success'}`}>
+                      {entry.value} L/min
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteClick(entry)}
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
               {todaysEntries.length > 3 && (
@@ -91,6 +117,14 @@ export function PeakFlowEntry({ onSubmit, todaysEntries, threshold }: PeakFlowEn
             {isSubmitting ? 'Adding...' : 'Add Reading'}
           </Button>
         </form>
+
+        <DeleteConfirmationDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onConfirm={handleDeleteConfirm}
+          entryValue={entryToDelete?.value || 0}
+          entryTime={entryToDelete?.time || ''}
+        />
       </CardContent>
     </Card>
   );

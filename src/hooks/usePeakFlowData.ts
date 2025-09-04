@@ -61,6 +61,10 @@ export function usePeakFlowData() {
     setEntries([newEntry, ...entries].sort((a, b) => b.timestamp - a.timestamp));
   };
 
+  const deleteEntry = (entryId: string) => {
+    setEntries(entries.filter(entry => entry.id !== entryId));
+  };
+
   const getTodaysEntries = () => {
     const today = new Date().toISOString().split('T')[0];
     return entries.filter(entry => entry.date === today);
@@ -123,6 +127,7 @@ export function usePeakFlowData() {
     entries,
     settings,
     addEntry,
+    deleteEntry,
     setSettings,
     getTodaysEntries,
     getAverages,

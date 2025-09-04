@@ -17,6 +17,7 @@ const Index = () => {
     entries,
     settings,
     addEntry,
+    deleteEntry,
     setSettings,
     getTodaysEntries,
     getAverages,
@@ -44,6 +45,15 @@ const Index = () => {
         variant: "default"
       });
     }
+  };
+
+  const handleDeleteEntry = (entryId: string) => {
+    deleteEntry(entryId);
+    toast({
+      title: "Reading Deleted",
+      description: "Peak flow reading has been removed",
+      variant: "default"
+    });
   };
 
   const handleSettingsSave = (newSettings: typeof settings) => {
@@ -97,6 +107,7 @@ const Index = () => {
           <div>
             <PeakFlowEntry
               onSubmit={handleAddEntry}
+              onDelete={handleDeleteEntry}
               todaysEntries={todaysEntries}
               threshold={settings.threshold}
             />
