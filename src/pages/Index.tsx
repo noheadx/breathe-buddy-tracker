@@ -21,25 +21,32 @@ const Index = () => {
 
   // Check authentication
   useEffect(() => {
+    let isMounted = true;
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!isMounted) return;
       setUser(session?.user ?? null);
       setAuthLoading(false);
       if (!session?.user) {
-        navigate('/auth');
+        setTimeout(() => navigate('/auth', { replace: true }), 0);
       }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
       setUser(session?.user ?? null);
-      if (!session?.user) {
-        navigate('/auth');
+      if (!session?.user && !authLoading) {
+        setTimeout(() => navigate('/auth', { replace: true }), 0);
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate, authLoading]);
   
   const {
     entries,
