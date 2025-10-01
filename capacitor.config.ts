@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.breathebuddytracker',
-  appName: 'breathe-buddy-tracker',
+  appName: 'PeakFlow-Tracker',
   webDir: 'dist',
   plugins: {
     SplashScreen: {
