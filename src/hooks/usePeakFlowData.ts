@@ -1,68 +1,120 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { PeakFlowEntry, PeakFlowSettings, AverageData } from '@/types/peakflow';
-
-const STORAGE_KEYS = {
-  ENTRIES: 'peakflow-entries',
-  SETTINGS: 'peakflow-settings'
-};
+import { useToast } from '@/hooks/use-toast';
 
 const DEFAULT_SETTINGS: PeakFlowSettings = {
   threshold: 300,
   name: ''
 };
 
-export function usePeakFlowData() {
+export function usePeakFlowData(userId: string | undefined) {
   const [entries, setEntries] = useState<PeakFlowEntry[]>([]);
   const [settings, setSettings] = useState<PeakFlowSettings>(DEFAULT_SETTINGS);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Load data from localStorage
+  // Load entries and settings from database
   useEffect(() => {
-    const savedEntries = localStorage.getItem(STORAGE_KEYS.ENTRIES);
-    const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-
-    if (savedEntries) {
-      const parsedEntries = JSON.parse(savedEntries);
-      // Migrate old entries that don't have time field
-      const migratedEntries = parsedEntries.map((entry: any) => ({
-        ...entry,
-        time: entry.time || '12:00:00' // Default time for old entries
-      }));
-      setEntries(migratedEntries);
+    if (!userId) {
+      setLoading(false);
+      return;
     }
 
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
-  }, []);
+    const loadData = async () => {
+      try {
+        // Load entries
+        const { data: entriesData, error: entriesError } = await supabase
+          .from('peak_flow_entries')
+          .select('*')
+          .eq('user_id', userId)
+          .order('timestamp', { ascending: false });
 
-  // Save entries to localStorage
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.ENTRIES, JSON.stringify(entries));
-  }, [entries]);
+        if (entriesError) throw entriesError;
+        setEntries(entriesData || []);
 
-  // Save settings to localStorage
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-  }, [settings]);
+        // Load settings
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
 
-  const addEntry = (value: number) => {
-    const now = new Date();
-    const dateString = now.toISOString().split('T')[0];
-    const timeString = now.toTimeString().split(' ')[0]; // HH:MM:SS format
-    
-    const newEntry: PeakFlowEntry = {
-      id: Date.now().toString(),
-      value,
-      date: dateString,
-      time: timeString,
-      timestamp: Date.now()
+        if (settingsError && settingsError.code !== 'PGRST116') {
+          throw settingsError;
+        }
+
+        // Load profile
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('id', userId)
+          .single();
+
+        setSettings({
+          threshold: settingsData?.threshold || DEFAULT_SETTINGS.threshold,
+          name: profileData?.name || DEFAULT_SETTINGS.name,
+        });
+      } catch (error: any) {
+        toast({
+          title: 'Error loading data',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setEntries([newEntry, ...entries].sort((a, b) => b.timestamp - a.timestamp));
+    loadData();
+  }, [userId, toast]);
+
+  const addEntry = async (value: number) => {
+    if (!userId) return;
+
+    const now = new Date();
+    const newEntry: any = {
+      user_id: userId,
+      value,
+      date: now.toISOString().split('T')[0],
+      time: now.toISOString(),
+      timestamp: now.getTime(),
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from('peak_flow_entries')
+        .insert([newEntry])
+        .select()
+        .single();
+
+      if (error) throw error;
+      setEntries((prev) => [data, ...prev]);
+    } catch (error: any) {
+      toast({
+        title: 'Error adding entry',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
-  const deleteEntry = (entryId: string) => {
-    setEntries(entries.filter(entry => entry.id !== entryId));
+  const deleteEntry = async (entryId: string) => {
+    try {
+      const { error } = await supabase
+        .from('peak_flow_entries')
+        .delete()
+        .eq('id', entryId);
+
+      if (error) throw error;
+      setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+    } catch (error: any) {
+      toast({
+        title: 'Error deleting entry',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
   const getTodaysEntries = () => {
@@ -123,12 +175,45 @@ export function usePeakFlowData() {
     return entries.slice(0, limit);
   };
 
+  const updateSettings = async (newSettings: PeakFlowSettings) => {
+    if (!userId) return;
+
+    try {
+      // Update settings
+      const { error: settingsError } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: userId,
+          threshold: newSettings.threshold,
+        });
+
+      if (settingsError) throw settingsError;
+
+      // Update profile name
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ name: newSettings.name })
+        .eq('id', userId);
+
+      if (profileError) throw profileError;
+
+      setSettings(newSettings);
+    } catch (error: any) {
+      toast({
+        title: 'Error updating settings',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return {
     entries,
     settings,
+    loading,
     addEntry,
     deleteEntry,
-    setSettings,
+    setSettings: updateSettings,
     getTodaysEntries,
     getAverages,
     isUnderThreshold,
