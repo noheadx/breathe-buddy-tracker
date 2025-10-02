@@ -133,9 +133,91 @@ This project was built with [Lovable](https://lovable.dev), an AI-powered develo
 3. Make your changes
 4. Submit a pull request
 
-## Deployment
+## Running as a Mobile App (iOS/Android)
 
-The easiest way to deploy this application is through Lovable:
+This app is configured to run as a native mobile application using Capacitor.
+
+### Prerequisites for Mobile Development
+
+- **For iOS**: macOS with Xcode installed
+- **For Android**: Android Studio installed
+- Git access to the repository
+
+### Mobile Setup Instructions
+
+1. **Export and Clone the Repository**
+   - Click "Export to Github" in Lovable to transfer the project
+   - Clone the repository to your local machine:
+   ```bash
+   git clone <YOUR_GIT_URL>
+   cd <YOUR_PROJECT_NAME>
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Add Native Platforms**
+   
+   For iOS:
+   ```bash
+   npx cap add ios
+   ```
+   
+   For Android:
+   ```bash
+   npx cap add android
+   ```
+
+4. **Update Native Platform Dependencies**
+   
+   For iOS:
+   ```bash
+   npx cap update ios
+   ```
+   
+   For Android:
+   ```bash
+   npx cap update android
+   ```
+
+5. **Build the Project**
+   ```bash
+   npm run build
+   ```
+
+6. **Sync with Native Platforms**
+   ```bash
+   npx cap sync
+   ```
+   
+   ⚠️ **Important**: Run `npx cap sync` after every `git pull` to keep native platforms in sync
+
+7. **Run on Device/Emulator**
+   
+   For iOS:
+   ```bash
+   npx cap run ios
+   ```
+   
+   For Android:
+   ```bash
+   npx cap run android
+   ```
+
+### Hot Reload During Development
+
+The app is configured for hot reload from the Lovable sandbox. You can develop in Lovable and test changes instantly on your mobile device without rebuilding.
+
+### Learn More
+
+For detailed guidance on mobile development, running on physical devices, and native capabilities, read our comprehensive guide:
+[Mobile Development with Lovable](https://lovable.dev/blogs/TODO)
+
+## Web Deployment
+
+The easiest way to deploy this application as a web app is through Lovable:
 
 1. Visit your [Lovable project](https://lovable.dev/projects/5bdd19a6-2450-429e-9258-8b968c43ad4d)
 2. Click "Share" → "Publish"
