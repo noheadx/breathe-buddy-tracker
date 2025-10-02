@@ -17,14 +17,11 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Clear any existing sessions on mount and redirect if authenticated
+  // Redirect if already authenticated
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        // Force sign out and reload to clear cached session
-        supabase.auth.signOut().then(() => {
-          window.location.reload();
-        });
+        navigate("/", { replace: true });
       }
     });
   }, [navigate]);
