@@ -129,16 +129,11 @@ const Auth = () => {
               />
             </div>
             <div className="space-y-2">
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="password">Password</Label>
-                <p className="text-xs text-muted-foreground">
-                  (at least 8 characters, 1 uppercase, 1 lowercase, 1 number & 1 special character)
-                </p>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={isLogin ? "••••••••" : "(min 8 chars: A-z, 0-9, symbol)"}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
