@@ -15,4 +15,7 @@ export interface AverageData {
   average: number;
   count: number;
   label: string;
+  daysWithData: number;
+  requiredDays: number;
+  hasEnoughData: boolean;
 }

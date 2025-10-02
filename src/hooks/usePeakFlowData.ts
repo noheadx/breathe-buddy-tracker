@@ -114,7 +114,7 @@ export function usePeakFlowData(userId: string | undefined) {
   };
 
   const getAverages = (): AverageData[] => {
-    const periods = [5, 7, 10, 30];
+    const periods = [5, 7, 10, 30, 90];
     const now = new Date();
     const today = now.toISOString().split('T')[0];
 
@@ -129,7 +129,10 @@ export function usePeakFlowData(userId: string | undefined) {
         period: 'today',
         average: Math.round(todaysAverage),
         count: todaysEntries.length,
-        label: "Today"
+        label: "Today",
+        daysWithData: 1,
+        requiredDays: 1,
+        hasEnoughData: true
       }
     ];
 
@@ -143,6 +146,11 @@ export function usePeakFlowData(userId: string | undefined) {
         return entryDate >= cutoffDate;
       });
 
+      // Calculate unique days with data
+      const uniqueDates = new Set(recentEntries.map(entry => entry.date));
+      const daysWithData = uniqueDates.size;
+      const hasEnoughData = daysWithData >= period;
+
       const average = recentEntries.length > 0
         ? recentEntries.reduce((sum, entry) => sum + entry.value, 0) / recentEntries.length
         : 0;
@@ -151,7 +159,10 @@ export function usePeakFlowData(userId: string | undefined) {
         period,
         average: Math.round(average),
         count: recentEntries.length,
-        label: `${period} days`
+        label: `${period} days`,
+        daysWithData,
+        requiredDays: period,
+        hasEnoughData
       });
     });
 
