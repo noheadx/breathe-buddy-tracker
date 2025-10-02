@@ -23,7 +23,7 @@ const Auth = () => {
     if (!/[a-z]/.test(pwd)) return "Password must contain at least 1 lowercase letter";
     if (!/[A-Z]/.test(pwd)) return "Password must contain at least 1 uppercase letter";
     if (!/[0-9]/.test(pwd)) return "Password must contain at least 1 number";
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) return "Password must contain at least 1 special character";
+    if (!/[!@#$%^&*(),.?":{}|<>+]/.test(pwd)) return "Password must contain at least 1 special character";
     return "";
   };
 
@@ -129,7 +129,12 @@ const Auth = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex flex-col gap-1">
+                <Label htmlFor="password">Password</Label>
+                <p className="text-xs text-muted-foreground">
+                  (at least 8 characters, 1 uppercase, 1 lowercase, 1 number & 1 special character)
+                </p>
+              </div>
               <Input
                 id="password"
                 type="password"
