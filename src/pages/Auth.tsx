@@ -13,9 +13,19 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const validatePassword = (pwd: string): string => {
+    if (pwd.length < 8) return "Password must be at least 8 characters";
+    if (!/[a-z]/.test(pwd)) return "Password must contain at least 1 lowercase letter";
+    if (!/[A-Z]/.test(pwd)) return "Password must contain at least 1 uppercase letter";
+    if (!/[0-9]/.test(pwd)) return "Password must contain at least 1 number";
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) return "Password must contain at least 1 special character";
+    return "";
+  };
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -28,6 +38,16 @@ const Auth = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate password for signup
+    if (!isLogin) {
+      const error = validatePassword(password);
+      if (error) {
+        setPasswordError(error);
+        return;
+      }
+    }
+    
     setLoading(true);
 
     try {
@@ -115,10 +135,21 @@ const Auth = () => {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (!isLogin) {
+                    setPasswordError(validatePassword(e.target.value));
+                  }
+                }}
                 required
-                minLength={6}
+                className={passwordError && !isLogin ? "border-destructive" : ""}
               />
+              {!isLogin && passwordError && (
+                <p className="text-sm text-destructive">{passwordError}</p>
+              )}
+              {!isLogin && !passwordError && password && (
+                <p className="text-sm text-muted-foreground">✓ Password meets all requirements</p>
+              )}
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
