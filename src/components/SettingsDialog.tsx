@@ -10,9 +10,10 @@ interface SettingsDialogProps {
   onOpenChange: (open: boolean) => void;
   settings: PeakFlowSettings;
   onSave: (settings: PeakFlowSettings) => void;
+  onLogout: () => void;
 }
 
-export function SettingsDialog({ open, onOpenChange, settings, onSave }: SettingsDialogProps) {
+export function SettingsDialog({ open, onOpenChange, settings, onSave, onLogout }: SettingsDialogProps) {
   const [formData, setFormData] = useState(settings);
 
   const handleSave = () => {
@@ -52,12 +53,17 @@ export function SettingsDialog({ open, onOpenChange, settings, onSave }: Setting
             </p>
           </div>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-            Cancel
-          </Button>
-          <Button onClick={handleSave} className="flex-1">
-            Save Settings
+        <div className="flex flex-col gap-3">
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+              Cancel
+            </Button>
+            <Button onClick={handleSave} className="flex-1">
+              Save Settings
+            </Button>
+          </div>
+          <Button variant="destructive" onClick={onLogout} className="w-full">
+            Sign Out
           </Button>
         </div>
       </DialogContent>

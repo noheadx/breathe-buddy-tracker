@@ -192,6 +192,7 @@ const Index = () => {
           onOpenChange={setSettingsOpen}
           settings={settings}
           onSave={handleSettingsSave}
+          onLogout={handleLogout}
         />
       </div>
     </div>
