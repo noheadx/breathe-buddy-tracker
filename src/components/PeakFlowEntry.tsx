@@ -65,7 +65,7 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: 
                 <div key={entry.id} className="flex justify-between items-center text-sm p-2 bg-background rounded border">
                   <div className="flex items-center gap-3">
                     <span className="text-muted-foreground">
-                      {entry.time ? entry.time.slice(0, 5) : '--:--'}
+                      {entry.time ? new Date(entry.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : '--:--'}
                     </span>
                     <span className={`font-medium ${entry.value < threshold ? 'text-danger' : 'text-success'}`}>
                       {entry.value} L/min
