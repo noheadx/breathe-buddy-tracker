@@ -13,6 +13,7 @@ Peak Flow Tracker helps users monitor their respiratory health by logging peak f
 - 🔔 **Threshold Alerts** - Get notified when readings fall below your personal threshold
 - 📱 **Responsive Design** - Works seamlessly on desktop and mobile devices
 - 👤 **User Authentication** - Secure login and personal data management
+- 🔑 **Password Reset** - Email-based password recovery with secure verification codes
 - 🎯 **Smart Insights** - Track progress and identify patterns in your respiratory health
 - ⚡ **Real-time Updates** - Instant feedback on new readings
 - 🌙 **Dark Mode Support** - Comfortable viewing in any lighting condition
@@ -23,7 +24,8 @@ Peak Flow Tracker helps users monitor their respiratory health by logging peak f
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS with shadcn-ui components
 - **Backend**: Lovable Cloud (Supabase)
-- **Authentication**: Supabase Auth
+- **Authentication**: Supabase Auth with email verification
+- **Email Service**: Resend (noreply@9oaks.app)
 - **Database**: PostgreSQL via Supabase
 - **State Management**: TanStack Query (React Query)
 - **Routing**: React Router v6
@@ -72,6 +74,16 @@ The production-ready files will be generated in the `dist` directory.
 2. **Set Your Threshold**: Configure your personal peak flow threshold in Settings
 3. **Start Logging**: Begin recording your daily peak flow readings
 
+### Password Recovery
+
+If you forget your password:
+
+1. Click "Forgot password?" on the login page
+2. Enter your email address
+3. Check your email for a 6-digit verification code
+4. Enter the code and set your new password
+5. The code expires in 15 minutes for security
+
 ### Logging Readings
 
 1. Enter your peak flow value in the input field
@@ -116,13 +128,23 @@ src/
 
 ## Database Schema
 
-The app uses three main tables:
+The app uses four main tables:
 
 - **peak_flow_entries**: Stores individual readings with timestamp and value
 - **user_settings**: Manages user preferences and threshold values
 - **profiles**: Contains user profile information
+- **password_reset_codes**: Securely stores password reset verification codes with expiration
 
 All tables are protected with Row-Level Security (RLS) policies to ensure data privacy.
+
+## Backend Functions
+
+The app includes serverless edge functions for:
+
+- **send-reset-code**: Generates and emails 6-digit password reset codes
+- **verify-reset-code**: Validates reset codes and updates user passwords
+
+These functions use Resend for reliable email delivery from noreply@9oaks.app.
 
 ## Running as a Mobile App (iOS/Android)
 
