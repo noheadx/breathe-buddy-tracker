@@ -24,6 +24,10 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [resetStep, setResetStep] = useState<"email" | "code">("email");
   const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -101,27 +105,82 @@ const Auth = () => {
     }
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleSendResetCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setResetLoading(true);
-
+    
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      const { error } = await supabase.functions.invoke("send-reset-code", {
+        body: { email: resetEmail },
       });
       
       if (error) throw error;
       
       toast({
-        title: "Check your email",
-        description: "We've sent you a password reset link.",
+        title: "Code sent",
+        description: "Check your email for the 6-digit reset code.",
       });
-      setShowForgotPassword(false);
-      setResetEmail("");
+      setResetStep("code");
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleVerifyCodeAndReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmNewPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      toast({
+        title: "Invalid password",
+        description: passwordError,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResetLoading(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("verify-reset-code", {
+        body: { 
+          email: resetEmail, 
+          code: resetCode,
+          newPassword 
+        },
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Password reset successful",
+        description: "You can now login with your new password.",
+      });
+      setShowForgotPassword(false);
+      setResetEmail("");
+      setResetCode("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setResetStep("email");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Invalid or expired code",
         variant: "destructive",
       });
     } finally {
@@ -218,31 +277,95 @@ const Auth = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+      <Dialog open={showForgotPassword} onOpenChange={(open) => {
+        setShowForgotPassword(open);
+        if (!open) {
+          setResetStep("email");
+          setResetEmail("");
+          setResetCode("");
+          setNewPassword("");
+          setConfirmNewPassword("");
+        }
+      }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reset your password</DialogTitle>
+            <DialogTitle>Reset Password</DialogTitle>
             <DialogDescription>
-              Enter your email address and we'll send you a link to reset your password.
+              {resetStep === "email" 
+                ? "Enter your email address and we'll send you a 6-digit code."
+                : "Enter the code from your email and your new password."}
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleForgotPassword} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="reset-email">Email</Label>
-              <Input
-                id="reset-email"
-                type="email"
-                placeholder="you@example.com"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={resetLoading}>
-              {resetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Send reset link
-            </Button>
-          </form>
+          
+          {resetStep === "email" ? (
+            <form onSubmit={handleSendResetCode} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">Email</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={resetLoading}>
+                {resetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Send Code
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyCodeAndReset} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-code">6-Digit Code</Label>
+                <Input
+                  id="reset-code"
+                  type="text"
+                  placeholder="Enter code"
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  maxLength={6}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="(min 8 chars: A-z, 0-9, symbol)"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                <Input
+                  id="confirm-new-password"
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={resetLoading}>
+                {resetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Reset Password
+              </Button>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="w-full" 
+                onClick={() => setResetStep("email")}
+                disabled={resetLoading}
+              >
+                Back to Email
+              </Button>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     </div>
