@@ -29,15 +29,6 @@ export function SettingsDialog({ open, onOpenChange, settings, onSave, onLogout 
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name (optional)</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Enter your name"
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="threshold">Threshold (L/min)</Label>
             <Input
               id="threshold"

@@ -4,8 +4,7 @@ import { PeakFlowEntry, PeakFlowSettings, AverageData } from '@/types/peakflow';
 import { useToast } from '@/hooks/use-toast';
 
 const DEFAULT_SETTINGS: PeakFlowSettings = {
-  threshold: 300,
-  name: ''
+  threshold: 300
 };
 
 export function usePeakFlowData(userId: string | undefined) {
@@ -44,16 +43,8 @@ export function usePeakFlowData(userId: string | undefined) {
           throw settingsError;
         }
 
-        // Load profile
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('name')
-          .eq('id', userId)
-          .single();
-
         setSettings({
-          threshold: settingsData?.threshold || DEFAULT_SETTINGS.threshold,
-          name: profileData?.name || DEFAULT_SETTINGS.name,
+          threshold: settingsData?.threshold || DEFAULT_SETTINGS.threshold
         });
       } catch (error: any) {
         toast({
@@ -188,14 +179,6 @@ export function usePeakFlowData(userId: string | undefined) {
         });
 
       if (settingsError) throw settingsError;
-
-      // Update profile name
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ name: newSettings.name })
-        .eq('id', userId);
-
-      if (profileError) throw profileError;
 
       setSettings(newSettings);
     } catch (error: any) {

@@ -8,7 +8,6 @@ export interface PeakFlowEntry {
 
 export interface PeakFlowSettings {
   threshold: number;
-  name: string;
 }
 
 export interface AverageData {

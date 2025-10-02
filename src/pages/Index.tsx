@@ -124,9 +124,7 @@ const Index = () => {
               <Activity className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">
-                {settings.name ? `${settings.name}'s ` : ''}Peak Flow Tracker
-              </h1>
+              <h1 className="text-2xl font-bold">Peak Flow Tracker</h1>
             </div>
           </div>
           <div className="flex gap-2">
