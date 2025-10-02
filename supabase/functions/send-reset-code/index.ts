@@ -59,7 +59,7 @@ serve(async (req: Request): Promise<Response> => {
 
     // Send email
     const { error: emailError } = await resend.emails.send({
-      from: "Peak Flow Tracker <onboarding@resend.dev>",
+      from: "Peak Flow Tracker <noreply@breathe-buddy-tracker.lovable.app>",
       to: [email],
       subject: "Password Reset Code",
       html: `
