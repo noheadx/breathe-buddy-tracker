@@ -64,7 +64,7 @@ export function RecentReadings({ entries, threshold }: RecentReadingsProps) {
                       {isToday ? 'Today' : format(date, 'MMM dd')}
                       {entry.time && (
                         <span className="text-xs text-muted-foreground ml-2">
-                          {entry.time.slice(0, 5)}
+                          {new Date(entry.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
                         </span>
                       )}
                     </div>
