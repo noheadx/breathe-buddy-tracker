@@ -40,7 +40,10 @@ export function AverageDisplay({ averages, threshold }: AverageDisplayProps) {
                   <div className={`text-2xl font-bold ${
                     avg.average && avg.average < threshold ? 'text-danger' : 'text-success'
                   }`}>
-                    {avg.count > 0 ? avg.average : '--'}
+                    {avg.period === 'today' 
+                      ? (avg.count > 0 ? avg.average : '--')
+                      : `avg, ${avg.average}`
+                    }
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
                     {avg.count} reading{avg.count !== 1 ? 's' : ''}
@@ -52,7 +55,7 @@ export function AverageDisplay({ averages, threshold }: AverageDisplayProps) {
                     Not enough readings yet
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {avg.requiredDays - avg.daysWithData} day{avg.requiredDays - avg.daysWithData !== 1 ? 's' : ''} left
+                    {avg.requiredDays - avg.count} more reading{avg.requiredDays - avg.count !== 1 ? 's' : ''} needed
                   </div>
                 </>
               )}
