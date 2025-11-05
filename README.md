@@ -95,8 +95,14 @@ If you forget your password:
 - **Today's Readings**: See all measurements taken today
 - **Recent Readings**: View your latest entries with date and time
 - **Average Tiles**: Monitor trends across different time periods
-  - Averages only appear once sufficient data is collected
-  - Each tile shows remaining days needed for calculation
+  - **Today**: Shows today's readings
+  - **5 days**: Average appears after at least 3 readings in the past 5 days
+  - **7 days**: Average appears after at least 5 readings in the past 7 days
+  - **10 days**: Average appears after at least 7 readings in the past 10 days
+  - **30 days**: Average appears after at least 20 readings in the past 30 days
+  - **90 days**: Average appears after at least 70 readings in the past 90 days
+  - Each tile displays the number of readings used in the calculation
+  - Tiles show how many more readings are needed until the average can be calculated
 
 ### Managing Settings
 
