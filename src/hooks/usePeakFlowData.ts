@@ -136,7 +136,15 @@ export function usePeakFlowData(userId: string | undefined) {
       }
     ];
 
-    // Historical averages
+    // Historical averages with minimum reading requirements
+    const requirements: { [key: number]: number } = {
+      5: 3,
+      7: 5,
+      10: 7,
+      30: 20,
+      90: 70
+    };
+
     periods.forEach(period => {
       const cutoffDate = new Date(now);
       cutoffDate.setDate(cutoffDate.getDate() - period);
@@ -146,10 +154,8 @@ export function usePeakFlowData(userId: string | undefined) {
         return entryDate >= cutoffDate;
       });
 
-      // Calculate unique days with data
-      const uniqueDates = new Set(recentEntries.map(entry => entry.date));
-      const daysWithData = uniqueDates.size;
-      const hasEnoughData = daysWithData >= period;
+      const minReadings = requirements[period];
+      const hasEnoughData = recentEntries.length >= minReadings;
 
       const average = recentEntries.length > 0
         ? recentEntries.reduce((sum, entry) => sum + entry.value, 0) / recentEntries.length
@@ -160,8 +166,8 @@ export function usePeakFlowData(userId: string | undefined) {
         average: Math.round(average),
         count: recentEntries.length,
         label: `${period} days`,
-        daysWithData,
-        requiredDays: period,
+        daysWithData: recentEntries.length,
+        requiredDays: minReadings,
         hasEnoughData
       });
     });
