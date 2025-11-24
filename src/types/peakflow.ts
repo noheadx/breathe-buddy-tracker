@@ -4,7 +4,7 @@ export interface PeakFlowEntry {
   date: string; // ISO date string (YYYY-MM-DD)
   time: string; // ISO time string
   timestamp: number;
-  condition?: string | null;
+  condition?: number | null;
   morning_dose?: number | null;
   evening_dose?: number | null;
 }

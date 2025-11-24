@@ -34,7 +34,7 @@ export default function Analytics({ entries }: AnalyticsProps) {
   const combinedData = filteredEntries.map(entry => ({
     date: format(new Date(entry.date), 'MMM dd'),
     peakFlow: entry.value,
-    wellBeing: entry.condition === 'good' ? 3 : entry.condition === 'moderate' ? 2 : entry.condition === 'poor' ? 1 : 0,
+    wellBeing: entry.condition || 0,
     totalDose: (entry.morning_dose || 0) + (entry.evening_dose || 0),
   }));
 
@@ -87,8 +87,8 @@ export default function Analytics({ entries }: AnalyticsProps) {
                   yAxisId="right"
                   orientation="right"
                   className="text-xs"
-                  domain={[0, 'auto']}
-                  label={{ value: 'Dose / Well-being', angle: 90, position: 'insideRight', style: { fontSize: 12 } }}
+                  domain={[0, 10]}
+                  label={{ value: 'Dose / Well-being (1-10)', angle: 90, position: 'insideRight', style: { fontSize: 12 } }}
                 />
                 <Tooltip 
                   contentStyle={{ 
@@ -98,8 +98,9 @@ export default function Analytics({ entries }: AnalyticsProps) {
                   }}
                   formatter={(value: number, name: string) => {
                     if (name === 'wellBeing') {
-                      const labels = ['', 'Poor', 'Moderate', 'Good'];
-                      return [labels[value] || 'Unknown', 'Well-being'];
+                      if (value <= 3) return [value + " - I'm sick", 'Well-being'];
+                      if (value <= 7) return [value + ' - Felt better', 'Well-being'];
+                      return [value + ' - Feeling good!', 'Well-being'];
                     }
                     if (name === 'peakFlow') return [value, 'Peak Flow'];
                     if (name === 'totalDose') return [value, 'Total Dose'];

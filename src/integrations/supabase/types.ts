@@ -43,7 +43,7 @@ export type Database = {
       }
       peak_flow_entries: {
         Row: {
-          condition: string | null
+          condition: number | null
           created_at: string
           date: string
           evening_dose: number | null
@@ -55,7 +55,7 @@ export type Database = {
           value: number
         }
         Insert: {
-          condition?: string | null
+          condition?: number | null
           created_at?: string
           date: string
           evening_dose?: number | null
@@ -67,7 +67,7 @@ export type Database = {
           value: number
         }
         Update: {
-          condition?: string | null
+          condition?: number | null
           created_at?: string
           date?: string
           evening_dose?: number | null
