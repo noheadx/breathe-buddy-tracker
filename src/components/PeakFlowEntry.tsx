@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +24,11 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold, de
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<{ id: string; value: number; time: string; condition?: string | null; morning_dose?: number | null; evening_dose?: number | null } | null>(null);
+
+  useEffect(() => {
+    setMorningDose(defaultMorningDose.toString());
+    setEveningDose(defaultEveningDose.toString());
+  }, [defaultMorningDose, defaultEveningDose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
