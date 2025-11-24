@@ -121,17 +121,32 @@ export default function Analytics({ entries }: AnalyticsProps) {
                   }}
                 />
                 <Legend 
-                  formatter={(value) => {
-                    if (value === 'peakFlow') return 'Peak Flow';
-                    if (value === 'wellBeing') return 'Well-being';
-                    if (value === 'totalDose') return 'Total Dose';
-                    return value;
-                  }}
-                  onClick={(e) => {
-                    const dataKey = e.dataKey as keyof typeof visibleLines;
-                    toggleLine(dataKey);
-                  }}
-                  wrapperStyle={{ cursor: 'pointer' }}
+                  content={({ payload }) => (
+                    <div className="flex justify-center gap-6 mt-4">
+                      {payload?.map((entry) => {
+                        const dataKey = String(entry.dataKey) as keyof typeof visibleLines;
+                        const isVisible = visibleLines[dataKey];
+                        const label = dataKey === 'peakFlow' ? 'Peak Flow' : 
+                                     dataKey === 'wellBeing' ? 'Well-being' : 
+                                     'Total Dose';
+                        
+                        return (
+                          <button
+                            key={String(entry.dataKey)}
+                            onClick={() => toggleLine(dataKey)}
+                            className="flex items-center gap-2 px-3 py-1 rounded transition-all hover:bg-accent"
+                            style={{ opacity: isVisible ? 1 : 0.4 }}
+                          >
+                            <div
+                              className="w-4 h-0.5"
+                              style={{ backgroundColor: entry.color }}
+                            />
+                            <span className="text-sm">{label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 />
                 {visibleLines.peakFlow && (
                   <Line 
