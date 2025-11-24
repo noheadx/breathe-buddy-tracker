@@ -24,6 +24,19 @@ export default function Analytics({ entries }: AnalyticsProps) {
     }
     return '7';
   });
+  
+  const [visibleLines, setVisibleLines] = useState({
+    peakFlow: true,
+    wellBeing: true,
+    totalDose: true,
+  });
+
+  const toggleLine = (dataKey: keyof typeof visibleLines) => {
+    setVisibleLines(prev => ({
+      ...prev,
+      [dataKey]: !prev[dataKey],
+    }));
+  };
 
   const filteredEntries = entries.filter(entry => {
     const entryDate = new Date(entry.date);
@@ -114,34 +127,45 @@ export default function Analytics({ entries }: AnalyticsProps) {
                     if (value === 'totalDose') return 'Total Dose';
                     return value;
                   }}
+                  onClick={(e) => {
+                    const dataKey = e.dataKey as keyof typeof visibleLines;
+                    toggleLine(dataKey);
+                  }}
+                  wrapperStyle={{ cursor: 'pointer' }}
                 />
-                <Line 
-                  yAxisId="left"
-                  type="monotone" 
-                  dataKey="peakFlow" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--primary))' }}
-                  name="peakFlow"
-                />
-                <Line 
-                  yAxisId="right"
-                  type="monotone" 
-                  dataKey="wellBeing" 
-                  stroke="#22c55e" 
-                  strokeWidth={2}
-                  dot={{ fill: '#22c55e' }}
-                  name="wellBeing"
-                />
-                <Line 
-                  yAxisId="right"
-                  type="monotone" 
-                  dataKey="totalDose" 
-                  stroke="#ef4444" 
-                  strokeWidth={2}
-                  dot={{ fill: '#ef4444' }}
-                  name="totalDose"
-                />
+                {visibleLines.peakFlow && (
+                  <Line 
+                    yAxisId="left"
+                    type="monotone" 
+                    dataKey="peakFlow" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={2}
+                    dot={{ fill: 'hsl(var(--primary))' }}
+                    name="peakFlow"
+                  />
+                )}
+                {visibleLines.wellBeing && (
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="wellBeing" 
+                    stroke="#22c55e" 
+                    strokeWidth={2}
+                    dot={{ fill: '#22c55e' }}
+                    name="wellBeing"
+                  />
+                )}
+                {visibleLines.totalDose && (
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="totalDose" 
+                    stroke="#ef4444" 
+                    strokeWidth={2}
+                    dot={{ fill: '#ef4444' }}
+                    name="totalDose"
+                  />
+                )}
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
