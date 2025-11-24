@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCw } from 'lucide-react';
@@ -16,7 +16,14 @@ type Period = '7' | '14' | '30' | '90';
 
 export default function Analytics({ entries }: AnalyticsProps) {
   const navigate = useNavigate();
-  const [period, setPeriod] = useState<Period>('7');
+  const [searchParams] = useSearchParams();
+  const [period, setPeriod] = useState<Period>(() => {
+    const paramPeriod = searchParams.get('period');
+    if (paramPeriod === '7' || paramPeriod === '14' || paramPeriod === '30' || paramPeriod === '90') {
+      return paramPeriod;
+    }
+    return '7';
+  });
 
   const filteredEntries = entries.filter(entry => {
     const entryDate = new Date(entry.date);
