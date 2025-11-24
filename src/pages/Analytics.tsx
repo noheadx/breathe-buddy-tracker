@@ -31,20 +31,11 @@ export default function Analytics({ entries }: AnalyticsProps) {
     return isAfter(entryDate, cutoffDate);
   }).sort((a, b) => a.timestamp - b.timestamp);
 
-  const peakFlowData = filteredEntries.map(entry => ({
+  const combinedData = filteredEntries.map(entry => ({
     date: format(new Date(entry.date), 'MMM dd'),
-    value: entry.value,
-  }));
-
-  const conditionData = filteredEntries.map(entry => ({
-    date: format(new Date(entry.date), 'MMM dd'),
-    condition: entry.condition === 'good' ? 3 : entry.condition === 'moderate' ? 2 : entry.condition === 'poor' ? 1 : 0,
-  }));
-
-  const doseData = filteredEntries.map(entry => ({
-    date: format(new Date(entry.date), 'MMM dd'),
-    morning: entry.morning_dose || 0,
-    evening: entry.evening_dose || 0,
+    peakFlow: entry.value,
+    wellBeing: entry.condition === 'good' ? 3 : entry.condition === 'moderate' ? 2 : entry.condition === 'poor' ? 1 : 0,
+    totalDose: (entry.morning_dose || 0) + (entry.evening_dose || 0),
   }));
 
   return (
@@ -78,122 +69,82 @@ export default function Analytics({ entries }: AnalyticsProps) {
           </Select>
         </div>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Peak Flow</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={peakFlowData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="date" className="text-xs" />
-                  <YAxis className="text-xs" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '6px'
-                    }}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
-                    dot={{ fill: 'hsl(var(--primary))' }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Well-being</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={conditionData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="date" className="text-xs" />
-                  <YAxis 
-                    domain={[0, 3]} 
-                    ticks={[1, 2, 3]}
-                    tickFormatter={(value) => {
-                      if (value === 3) return 'Good';
-                      if (value === 2) return 'Moderate';
-                      if (value === 1) return 'Poor';
-                      return '';
-                    }}
-                    className="text-xs"
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '6px'
-                    }}
-                    formatter={(value: number) => {
-                      if (value === 3) return ['Good', 'Condition'];
-                      if (value === 2) return ['Moderate', 'Condition'];
-                      if (value === 1) return ['Poor', 'Condition'];
-                      return ['Unknown', 'Condition'];
-                    }}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="condition" 
-                    stroke="hsl(var(--chart-2))" 
-                    strokeWidth={2}
-                    dot={{ fill: 'hsl(var(--chart-2))' }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Medication Doses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={doseData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="date" className="text-xs" />
-                  <YAxis className="text-xs" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '6px'
-                    }}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="morning" 
-                    stroke="hsl(var(--chart-3))" 
-                    strokeWidth={2}
-                    dot={{ fill: 'hsl(var(--chart-3))' }}
-                    name="Morning"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="evening" 
-                    stroke="hsl(var(--chart-4))" 
-                    strokeWidth={2}
-                    dot={{ fill: 'hsl(var(--chart-4))' }}
-                    name="Evening"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Combined Analytics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={500}>
+              <LineChart data={combinedData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="date" className="text-xs" />
+                <YAxis 
+                  yAxisId="left"
+                  className="text-xs"
+                  label={{ value: 'Peak Flow (L/min)', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                />
+                <YAxis 
+                  yAxisId="right"
+                  orientation="right"
+                  className="text-xs"
+                  domain={[0, 'auto']}
+                  label={{ value: 'Dose / Well-being', angle: 90, position: 'insideRight', style: { fontSize: 12 } }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                  formatter={(value: number, name: string) => {
+                    if (name === 'wellBeing') {
+                      const labels = ['', 'Poor', 'Moderate', 'Good'];
+                      return [labels[value] || 'Unknown', 'Well-being'];
+                    }
+                    if (name === 'peakFlow') return [value, 'Peak Flow'];
+                    if (name === 'totalDose') return [value, 'Total Dose'];
+                    return [value, name];
+                  }}
+                />
+                <Legend 
+                  formatter={(value) => {
+                    if (value === 'peakFlow') return 'Peak Flow';
+                    if (value === 'wellBeing') return 'Well-being';
+                    if (value === 'totalDose') return 'Total Dose';
+                    return value;
+                  }}
+                />
+                <Line 
+                  yAxisId="left"
+                  type="monotone" 
+                  dataKey="peakFlow" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={2}
+                  dot={{ fill: 'hsl(var(--primary))' }}
+                  name="peakFlow"
+                />
+                <Line 
+                  yAxisId="right"
+                  type="monotone" 
+                  dataKey="wellBeing" 
+                  stroke="hsl(var(--chart-2))" 
+                  strokeWidth={2}
+                  dot={{ fill: 'hsl(var(--chart-2))' }}
+                  name="wellBeing"
+                />
+                <Line 
+                  yAxisId="right"
+                  type="monotone" 
+                  dataKey="totalDose" 
+                  stroke="hsl(var(--chart-3))" 
+                  strokeWidth={2}
+                  dot={{ fill: 'hsl(var(--chart-3))' }}
+                  name="totalDose"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
