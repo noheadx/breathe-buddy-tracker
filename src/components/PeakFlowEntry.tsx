@@ -3,21 +3,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Activity, Plus, Trash2 } from 'lucide-react';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
 interface PeakFlowEntryProps {
-  onSubmit: (value: number) => void;
+  onSubmit: (value: number, condition?: string, morningDose?: number, eveningDose?: number) => void;
   onDelete: (entryId: string) => void;
-  todaysEntries: Array<{ id: string; value: number; time: string }>;
+  todaysEntries: Array<{ id: string; value: number; time: string; condition?: string | null; morning_dose?: number | null; evening_dose?: number | null }>;
   threshold: number;
+  defaultMorningDose?: number;
+  defaultEveningDose?: number;
 }
 
-export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: PeakFlowEntryProps) {
+export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold, defaultMorningDose = 0, defaultEveningDose = 0 }: PeakFlowEntryProps) {
   const [value, setValue] = useState('');
+  const [condition, setCondition] = useState<string>('');
+  const [morningDose, setMorningDose] = useState(defaultMorningDose.toString());
+  const [eveningDose, setEveningDose] = useState(defaultEveningDose.toString());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [entryToDelete, setEntryToDelete] = useState<{ id: string; value: number; time: string } | null>(null);
+  const [entryToDelete, setEntryToDelete] = useState<{ id: string; value: number; time: string; condition?: string | null; morning_dose?: number | null; evening_dose?: number | null } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,8 +32,13 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: 
     if (!numValue || numValue <= 0) return;
     
     setIsSubmitting(true);
-    onSubmit(numValue);
+    const morning = parseInt(morningDose) || 0;
+    const evening = parseInt(eveningDose) || 0;
+    onSubmit(numValue, condition || undefined, morning || undefined, evening || undefined);
     setValue('');
+    setCondition('');
+    setMorningDose(defaultMorningDose.toString());
+    setEveningDose(defaultEveningDose.toString());
     
     // Reset submitting state after animation
     setTimeout(() => setIsSubmitting(false), 500);
@@ -36,7 +47,7 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: 
   const latestReading = todaysEntries[0];
   const hasReadingsToday = todaysEntries.length > 0;
 
-  const handleDeleteClick = (entry: { id: string; value: number; time: string }) => {
+  const handleDeleteClick = (entry: { id: string; value: number; time: string; condition?: string | null; morning_dose?: number | null; evening_dose?: number | null }) => {
     setEntryToDelete(entry);
     setDeleteDialogOpen(true);
   };
@@ -63,13 +74,25 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: 
             <div className="grid gap-2">
               {todaysEntries.slice(0, 3).map((entry, index) => (
                 <div key={entry.id} className="flex justify-between items-center text-sm p-2 bg-background rounded border">
-                  <div className="flex items-center gap-3">
-                    <span className="text-muted-foreground">
-                      {entry.time ? new Date(entry.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : '--:--'}
-                    </span>
-                    <span className={`font-medium ${entry.value < threshold ? 'text-danger' : 'text-success'}`}>
-                      {entry.value} L/min
-                    </span>
+                  <div className="flex flex-col gap-1 flex-1">
+                    <div className="flex items-center gap-3">
+                      <span className="text-muted-foreground">
+                        {entry.time ? new Date(entry.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : '--:--'}
+                      </span>
+                      <span className={`font-medium ${entry.value < threshold ? 'text-danger' : 'text-success'}`}>
+                        {entry.value} L/min
+                      </span>
+                    </div>
+                    {(entry.condition || entry.morning_dose !== null || entry.evening_dose !== null) && (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {entry.condition && <span>{entry.condition}</span>}
+                        {(entry.morning_dose !== null || entry.evening_dose !== null) && (
+                          <span>
+                            Doses: {entry.morning_dose || 0}/{entry.evening_dose || 0}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <Button
                     variant="ghost"
@@ -127,6 +150,56 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold }: 
               required
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="condition" className="text-base font-medium">
+              How are you feeling? (optional)
+            </Label>
+            <Select value={condition} onValueChange={setCondition}>
+              <SelectTrigger id="condition" className="h-12">
+                <SelectValue placeholder="Select condition" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Feeling good">Feeling good</SelectItem>
+                <SelectItem value="Felt better">Felt better</SelectItem>
+                <SelectItem value="I'm sick">I'm sick</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="morningDose" className="text-sm font-medium">
+                Morning Dose
+              </Label>
+              <Input
+                id="morningDose"
+                type="number"
+                value={morningDose}
+                onChange={(e) => setMorningDose(e.target.value)}
+                placeholder="0"
+                className="h-10"
+                min="0"
+                max="99"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="eveningDose" className="text-sm font-medium">
+                Evening Dose
+              </Label>
+              <Input
+                id="eveningDose"
+                type="number"
+                value={eveningDose}
+                onChange={(e) => setEveningDose(e.target.value)}
+                placeholder="0"
+                className="h-10"
+                min="0"
+                max="99"
+              />
+            </div>
+          </div>
+
           <Button 
             type="submit" 
             className="w-full h-12"

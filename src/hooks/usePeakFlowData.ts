@@ -4,7 +4,9 @@ import { PeakFlowEntry, PeakFlowSettings, AverageData } from '@/types/peakflow';
 import { useToast } from '@/hooks/use-toast';
 
 const DEFAULT_SETTINGS: PeakFlowSettings = {
-  threshold: 300
+  threshold: 300,
+  default_morning_dose: 0,
+  default_evening_dose: 0
 };
 
 export function usePeakFlowData(userId: string | undefined) {
@@ -44,7 +46,9 @@ export function usePeakFlowData(userId: string | undefined) {
         }
 
         setSettings({
-          threshold: settingsData?.threshold || DEFAULT_SETTINGS.threshold
+          threshold: settingsData?.threshold || DEFAULT_SETTINGS.threshold,
+          default_morning_dose: settingsData?.default_morning_dose || DEFAULT_SETTINGS.default_morning_dose,
+          default_evening_dose: settingsData?.default_evening_dose || DEFAULT_SETTINGS.default_evening_dose
         });
       } catch (error: any) {
         toast({
@@ -60,7 +64,7 @@ export function usePeakFlowData(userId: string | undefined) {
     loadData();
   }, [userId, toast]);
 
-  const addEntry = async (value: number) => {
+  const addEntry = async (value: number, condition?: string, morningDose?: number, eveningDose?: number) => {
     if (!userId) return;
 
     const now = new Date();
@@ -70,6 +74,9 @@ export function usePeakFlowData(userId: string | undefined) {
       date: now.toISOString().split('T')[0],
       time: now.toISOString(),
       timestamp: now.getTime(),
+      condition: condition || null,
+      morning_dose: morningDose || null,
+      evening_dose: eveningDose || null
     };
 
     try {
@@ -193,6 +200,8 @@ export function usePeakFlowData(userId: string | undefined) {
         .upsert({
           user_id: userId,
           threshold: newSettings.threshold,
+          default_morning_dose: newSettings.default_morning_dose || 0,
+          default_evening_dose: newSettings.default_evening_dose || 0
         });
 
       if (settingsError) throw settingsError;
