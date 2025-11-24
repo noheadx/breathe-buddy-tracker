@@ -121,32 +121,34 @@ export default function Analytics({ entries }: AnalyticsProps) {
                   }}
                 />
                 <Legend 
-                  content={({ payload }) => (
-                    <div className="flex justify-center gap-6 mt-4">
-                      {payload?.map((entry) => {
-                        const dataKey = String(entry.dataKey) as keyof typeof visibleLines;
-                        const isVisible = visibleLines[dataKey];
-                        const label = dataKey === 'peakFlow' ? 'Peak Flow' : 
-                                     dataKey === 'wellBeing' ? 'Well-being' : 
-                                     'Total Dose';
-                        
-                        return (
-                          <button
-                            key={String(entry.dataKey)}
-                            onClick={() => toggleLine(dataKey)}
-                            className="flex items-center gap-2 px-3 py-1 rounded transition-all hover:bg-accent"
-                            style={{ opacity: isVisible ? 1 : 0.4 }}
-                          >
-                            <div
-                              className="w-4 h-0.5"
-                              style={{ backgroundColor: entry.color }}
-                            />
-                            <span className="text-sm">{label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                  content={() => {
+                    const items: { key: keyof typeof visibleLines; label: string; color: string }[] = [
+                      { key: 'peakFlow', label: 'Peak Flow', color: 'hsl(var(--primary))' },
+                      { key: 'wellBeing', label: 'Well-being', color: '#22c55e' },
+                      { key: 'totalDose', label: 'Total Dose', color: '#ef4444' },
+                    ];
+                    return (
+                      <div className="flex justify-center gap-6 mt-4">
+                        {items.map((item) => {
+                          const isVisible = visibleLines[item.key];
+                          return (
+                            <button
+                              key={item.key}
+                              onClick={() => toggleLine(item.key)}
+                              className="flex items-center gap-2 px-3 py-1 rounded transition-all hover:bg-accent"
+                              style={{ opacity: isVisible ? 1 : 0.4 }}
+                            >
+                              <div
+                                className="w-4 h-0.5"
+                                style={{ backgroundColor: item.color }}
+                              />
+                              <span className="text-sm">{item.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  }}
                 />
                 {visibleLines.peakFlow && (
                   <Line 
