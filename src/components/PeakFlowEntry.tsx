@@ -3,14 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { Activity, Plus, Trash2 } from 'lucide-react';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
 interface PeakFlowEntryProps {
-  onSubmit: (value: number, condition?: string, morningDose?: number, eveningDose?: number) => void;
+  onSubmit: (value: number, condition?: number, morningDose?: number, eveningDose?: number) => void;
   onDelete: (entryId: string) => void;
-  todaysEntries: Array<{ id: string; value: number; time: string; condition?: string | null; morning_dose?: number | null; evening_dose?: number | null }>;
+  todaysEntries: Array<{ id: string; value: number; time: string; condition?: number | null; morning_dose?: number | null; evening_dose?: number | null }>;
   threshold: number;
   defaultMorningDose?: number;
   defaultEveningDose?: number;
@@ -18,17 +18,23 @@ interface PeakFlowEntryProps {
 
 export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold, defaultMorningDose = 0, defaultEveningDose = 0 }: PeakFlowEntryProps) {
   const [value, setValue] = useState('');
-  const [condition, setCondition] = useState<string>('');
+  const [condition, setCondition] = useState<number>(5);
   const [morningDose, setMorningDose] = useState(defaultMorningDose.toString());
   const [eveningDose, setEveningDose] = useState(defaultEveningDose.toString());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [entryToDelete, setEntryToDelete] = useState<{ id: string; value: number; time: string; condition?: string | null; morning_dose?: number | null; evening_dose?: number | null } | null>(null);
+  const [entryToDelete, setEntryToDelete] = useState<{ id: string; value: number; time: string; condition?: number | null; morning_dose?: number | null; evening_dose?: number | null } | null>(null);
 
   useEffect(() => {
     setMorningDose(defaultMorningDose.toString());
     setEveningDose(defaultEveningDose.toString());
   }, [defaultMorningDose, defaultEveningDose]);
+
+  const getConditionLabel = (value: number) => {
+    if (value <= 3) return "I'm sick";
+    if (value <= 7) return "Felt better";
+    return "Feeling good!";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,9 +45,9 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold, de
     setIsSubmitting(true);
     const morning = parseInt(morningDose) || 0;
     const evening = parseInt(eveningDose) || 0;
-    onSubmit(numValue, condition || undefined, morning || undefined, evening || undefined);
+    onSubmit(numValue, condition, morning || undefined, evening || undefined);
     setValue('');
-    setCondition('');
+    setCondition(5);
     setMorningDose(defaultMorningDose.toString());
     setEveningDose(defaultEveningDose.toString());
     
@@ -52,7 +58,7 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold, de
   const latestReading = todaysEntries[0];
   const hasReadingsToday = todaysEntries.length > 0;
 
-  const handleDeleteClick = (entry: { id: string; value: number; time: string; condition?: string | null; morning_dose?: number | null; evening_dose?: number | null }) => {
+  const handleDeleteClick = (entry: { id: string; value: number; time: string; condition?: number | null; morning_dose?: number | null; evening_dose?: number | null }) => {
     setEntryToDelete(entry);
     setDeleteDialogOpen(true);
   };
@@ -90,7 +96,7 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold, de
                     </div>
                     {(entry.condition || entry.morning_dose !== null || entry.evening_dose !== null) && (
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        {entry.condition && <span>{entry.condition}</span>}
+                        {entry.condition && <span>{getConditionLabel(entry.condition)}</span>}
                         {(entry.morning_dose !== null || entry.evening_dose !== null) && (
                           <span>
                             Doses: {entry.morning_dose || 0}/{entry.evening_dose || 0}
@@ -158,18 +164,24 @@ export function PeakFlowEntry({ onSubmit, onDelete, todaysEntries, threshold, de
 
           <div className="space-y-2">
             <Label htmlFor="condition" className="text-base font-medium">
-              How are you feeling? (optional)
+              How are you feeling?
             </Label>
-            <Select value={condition} onValueChange={setCondition}>
-              <SelectTrigger id="condition" className="h-12">
-                <SelectValue placeholder="Select condition" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Feeling good">Feeling good</SelectItem>
-                <SelectItem value="Felt better">Felt better</SelectItem>
-                <SelectItem value="I'm sick">I'm sick</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-4 px-2">
+              <Slider
+                id="condition"
+                min={1}
+                max={10}
+                step={1}
+                value={[condition]}
+                onValueChange={(value) => setCondition(value[0])}
+                className="cursor-pointer"
+              />
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">1</span>
+                <span className="text-lg font-medium text-foreground">{condition} - {getConditionLabel(condition)}</span>
+                <span className="text-muted-foreground">10</span>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

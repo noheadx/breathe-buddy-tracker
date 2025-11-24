@@ -65,7 +65,7 @@ const Index = () => {
   const averages = getAverages();
   const recentEntries = getRecentEntries();
 
-  const handleAddEntry = (value: number, condition?: string, morningDose?: number, eveningDose?: number) => {
+  const handleAddEntry = (value: number, condition?: number, morningDose?: number, eveningDose?: number) => {
     addEntry(value, condition, morningDose, eveningDose);
     
     if (isUnderThreshold(value)) {

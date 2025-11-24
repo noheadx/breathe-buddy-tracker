@@ -64,7 +64,7 @@ export function usePeakFlowData(userId: string | undefined) {
     loadData();
   }, [userId, toast]);
 
-  const addEntry = async (value: number, condition?: string, morningDose?: number, eveningDose?: number) => {
+  const addEntry = async (value: number, condition?: number, morningDose?: number, eveningDose?: number) => {
     if (!userId) return;
 
     const now = new Date();
