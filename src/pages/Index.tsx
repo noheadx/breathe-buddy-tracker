@@ -10,6 +10,7 @@ import { AverageDisplay } from '@/components/AverageDisplay';
 import { RecentReadings } from '@/components/RecentReadings';
 import { ThresholdAlert } from '@/components/ThresholdAlert';
 import { SettingsDialog } from '@/components/SettingsDialog';
+import { AnalyticsCard } from '@/components/AnalyticsCard';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -175,6 +176,11 @@ const Index = () => {
               averages={averages}
               threshold={settings.threshold}
             />
+          </div>
+
+          {/* Analytics Card */}
+          <div className="lg:col-span-2">
+            <AnalyticsCard />
           </div>
 
           {/* Recent Readings */}
