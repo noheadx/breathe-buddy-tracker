@@ -43,27 +43,36 @@ export type Database = {
       }
       peak_flow_entries: {
         Row: {
+          condition: string | null
           created_at: string
           date: string
+          evening_dose: number | null
           id: string
+          morning_dose: number | null
           time: string
           timestamp: number
           user_id: string
           value: number
         }
         Insert: {
+          condition?: string | null
           created_at?: string
           date: string
+          evening_dose?: number | null
           id?: string
+          morning_dose?: number | null
           time: string
           timestamp: number
           user_id: string
           value: number
         }
         Update: {
+          condition?: string | null
           created_at?: string
           date?: string
+          evening_dose?: number | null
           id?: string
+          morning_dose?: number | null
           time?: string
           timestamp?: number
           user_id?: string
@@ -102,16 +111,22 @@ export type Database = {
       }
       user_settings: {
         Row: {
+          default_evening_dose: number | null
+          default_morning_dose: number | null
           threshold: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          default_evening_dose?: number | null
+          default_morning_dose?: number | null
           threshold?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          default_evening_dose?: number | null
+          default_morning_dose?: number | null
           threshold?: number
           updated_at?: string
           user_id?: string
