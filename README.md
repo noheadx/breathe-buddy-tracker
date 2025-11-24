@@ -9,7 +9,10 @@ Peak Flow Tracker helps users monitor their respiratory health by logging peak f
 ## Features
 
 - 📊 **Daily Readings Tracking** - Log peak flow measurements throughout the day
+- 💊 **Medication Tracking** - Record morning and evening doses (0-2 per dose, max 4 total daily) alongside readings
+- 🩺 **Well-being Monitoring** - Track your condition on a 1-10 scale with each reading
 - 📈 **Multi-Period Averages** - View averages for Today, 5, 7, 10, 30, and 90 days
+- 📉 **Interactive Analytics** - Visualize trends with charts showing peak flow, well-being, and medication dosage over time
 - 🔔 **Threshold Alerts** - Get notified when readings fall below your personal threshold
 - 📱 **Responsive Design** - Works seamlessly on desktop and mobile devices
 - 👤 **User Authentication** - Secure login and personal data management
@@ -17,6 +20,7 @@ Peak Flow Tracker helps users monitor their respiratory health by logging peak f
 - 🎯 **Smart Insights** - Track progress and identify patterns in your respiratory health
 - ⚡ **Real-time Updates** - Instant feedback on new readings
 - 🌙 **Dark Mode Support** - Comfortable viewing in any lighting condition
+- 📤 **Data Export** - Export your peak flow data for sharing with healthcare providers
 
 ## Technology Stack
 
@@ -87,8 +91,23 @@ If you forget your password:
 ### Logging Readings
 
 1. Enter your peak flow value in the input field
-2. Click "Add Reading" to save
-3. The reading is automatically timestamped and saved to your account
+2. (Optional) Rate your well-being condition on a scale of 1-10
+3. (Optional) Record medication doses:
+   - Morning dose: 0-2 puffs
+   - Evening dose: 0-2 puffs
+   - Maximum total daily dose: 4 puffs
+4. Click "Add Reading" to save
+5. The reading is automatically timestamped and saved to your account
+
+### Viewing Analytics
+
+Navigate to the Analytics page to:
+- View interactive charts of your peak flow trends over time
+- Compare peak flow readings with well-being scores
+- Track medication usage patterns (total daily dose)
+- Toggle between different data series for focused analysis
+- Filter data by time period (7, 30, 90 days, or all time)
+- Export your data as CSV for medical consultations
 
 ### Viewing Statistics
 
@@ -124,6 +143,7 @@ src/
 │   └── usePeakFlowData.ts
 ├── pages/              # Page components
 │   ├── Index.tsx       # Main dashboard
+│   ├── Analytics.tsx   # Data visualization and charts
 │   ├── Auth.tsx        # Authentication page
 │   └── NotFound.tsx
 ├── types/              # TypeScript type definitions
@@ -136,8 +156,8 @@ src/
 
 The app uses four main tables:
 
-- **peak_flow_entries**: Stores individual readings with timestamp and value
-- **user_settings**: Manages user preferences and threshold values
+- **peak_flow_entries**: Stores individual readings with timestamp, value, condition (well-being 1-10), morning_dose (0-2), and evening_dose (0-2)
+- **user_settings**: Manages user preferences, threshold values, and default medication doses
 - **profiles**: Contains user profile information
 - **password_reset_codes**: Securely stores password reset verification codes with expiration
 
