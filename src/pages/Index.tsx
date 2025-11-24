@@ -65,8 +65,8 @@ const Index = () => {
   const averages = getAverages();
   const recentEntries = getRecentEntries();
 
-  const handleAddEntry = (value: number) => {
-    addEntry(value);
+  const handleAddEntry = (value: number, condition?: string, morningDose?: number, eveningDose?: number) => {
+    addEntry(value, condition, morningDose, eveningDose);
     
     if (isUnderThreshold(value)) {
       toast({
@@ -164,6 +164,8 @@ const Index = () => {
               onDelete={handleDeleteEntry}
               todaysEntries={todaysEntries}
               threshold={settings.threshold}
+              defaultMorningDose={settings.default_morning_dose}
+              defaultEveningDose={settings.default_evening_dose}
             />
           </div>
 
