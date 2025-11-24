@@ -128,18 +128,18 @@ export default function Analytics({ entries }: AnalyticsProps) {
                   yAxisId="right"
                   type="monotone" 
                   dataKey="wellBeing" 
-                  stroke="hsl(var(--chart-2))" 
+                  stroke="#22c55e" 
                   strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--chart-2))' }}
+                  dot={{ fill: '#22c55e' }}
                   name="wellBeing"
                 />
                 <Line 
                   yAxisId="right"
                   type="monotone" 
                   dataKey="totalDose" 
-                  stroke="hsl(var(--chart-3))" 
+                  stroke="#ef4444" 
                   strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--chart-3))' }}
+                  dot={{ fill: '#ef4444' }}
                   name="totalDose"
                 />
               </LineChart>
