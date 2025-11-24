@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, Calendar } from 'lucide-react';
 import { AverageData } from '@/types/peakflow';
+import { useNavigate } from 'react-router-dom';
 
 interface AverageDisplayProps {
   averages: AverageData[];
@@ -8,6 +9,15 @@ interface AverageDisplayProps {
 }
 
 export function AverageDisplay({ averages, threshold }: AverageDisplayProps) {
+  const navigate = useNavigate();
+
+  const getPeriodForAnalytics = (period: number | 'today'): string => {
+    if (period === 'today' || period <= 7) return '7';
+    if (period <= 14) return '14';
+    if (period <= 30) return '30';
+    return '90';
+  };
+
   return (
     <Card className="bg-card shadow-soft">
       <CardHeader>
@@ -21,9 +31,10 @@ export function AverageDisplay({ averages, threshold }: AverageDisplayProps) {
           {averages.map((avg, index) => (
             <div 
               key={avg.period} 
-              className={`text-center p-4 rounded-lg transition-colors ${
+              onClick={() => navigate(`/analytics?period=${getPeriodForAnalytics(avg.period)}`)}
+              className={`text-center p-4 rounded-lg transition-colors cursor-pointer ${
                 avg.period === 'today' 
-                  ? 'bg-primary/10 border border-primary/20' 
+                  ? 'bg-primary/10 border border-primary/20 hover:bg-primary/20' 
                   : 'bg-secondary/50 hover:bg-secondary/70'
               }`}
             >
